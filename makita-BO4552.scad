@@ -85,7 +85,7 @@ module assembly() {
         //
         // sander attachment with fillets
         //
-        translate( [0,0, 3.5] )  // 3.5 = fudge factor
+        translate( [0,0, 0] )  // 3.5 = fudge factor
         union() {
             translate( [ 0, sander_fitting_length, -((vacuum_diameter/2)-wall_thickness) ] )
             difference() {                
