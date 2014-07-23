@@ -10,7 +10,6 @@
 
 sander_fitting_corner = 1.5;
 wall_thickness        = 4;
-anti_manifold         = 8;
 
 sander_fitting_width  = 32;
 sander_fitting_height = 11;
@@ -41,32 +40,33 @@ module fillet(r, h) {
     }
 }
 
-module hull_inside() {
-    hull() {
-        rotate( [90,0,0] )
-        translate( [0, 0, 15] )
-        cylinder( d1 = vacuum_diameter, 
-                  d2 = vacuum_diameter + taper,
-                  h  = vacuum_length
-                  );
-        
-        translate( [ 0, 0, -((vacuum_diameter/2)-wall_thickness) ] )
-        cube( size = sander_diff_cube, center=true);
-    }
-}
 
 module hull_outside() {
     hull() {
         rotate( [90,0,0] )
         translate( [0, 0, 15] )
-        cylinder( d1 = vacuum_diameter+wall_thickness, 
-                  d2 = vacuum_diameter+wall_thickness + taper,
+        cylinder( d1 = vacuum_diameter + taper, 
+                  d2 = vacuum_diameter,
                   h  = vacuum_length
                   );
         
-        translate( [ 0, 0, -((vacuum_diameter/2)-wall_thickness) ] )          
-        cube( size = sander_fitting_wall, center=true);
-                  
+        translate( [ 0, 0, -(vacuum_diameter-sander_fitting_height-wall_thickness)/2] )          
+        cube( size = sander_fitting_wall, center=true);                  
+    }
+}
+
+
+module hull_inside() {
+    hull() {
+        rotate( [90,0,0] )
+        translate( [0, 0, 15] )
+        cylinder( d1 = vacuum_diameter - wall_thickness + taper, 
+                  d2 = vacuum_diameter - wall_thickness,
+                  h  = vacuum_length+1
+                  );
+        
+        translate( [ 0, 0, -(vacuum_diameter-sander_fitting_height-wall_thickness)/2 ] )
+        cube( size = sander_diff_cube, center=true);
     }
 }
 
@@ -85,6 +85,7 @@ module assembly() {
         //
         // sander attachment with fillets
         //
+        translate( [0,0, 3.5] )  // 3.5 = fudge factor
         union() {
             translate( [ 0, sander_fitting_length, -((vacuum_diameter/2)-wall_thickness) ] )
             difference() {                
@@ -130,7 +131,7 @@ module assembly() {
                         fillet( 1.5, sander_fitting_length);
                     }
                 }
-            }
+            } // chamfers
         }  // sander attachment
     } // top level union
 }
